@@ -1,2 +1,2 @@
 # notes
-personal notes for summarizing my learning 
+Personal notes for summarizing, explaining, and documenting certain topics.
