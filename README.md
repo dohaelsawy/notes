@@ -6,3 +6,6 @@ Personal notes for summarizing, explaining, and documenting certain topics.
   - books
       - Linux Interface
       - Three Easy Pieces
+
+- Ruby
+  - basics
