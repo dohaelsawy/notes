@@ -55,8 +55,6 @@ basics from [GoRails](https://gorails.com/episodes/strings-in-ruby?autoplay=1) s
 
 - **=~** : Returns the index of the first substring that matches a given Regexp or other object; returns nil if no match is found.
 
-
-
 - **match**: Returns a MatchData object if the string matches a given Regexp; nil otherwise.
 
 - **match?**: Returns true if the string matches a given Regexp; false otherwise.
@@ -74,7 +72,7 @@ basics from [GoRails](https://gorails.com/episodes/strings-in-ruby?autoplay=1) s
 
 ### Integers
 
--**<=>**: Returns a number indicating whether self is less than, equal to, or greater than the given value.
+- **<=>**: Returns a number indicating whether self is less than, equal to, or greater than the given value.
 
 - **ceil**: Returns the smallest number greater than or equal to self.
 
