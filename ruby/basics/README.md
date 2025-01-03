@@ -107,3 +107,48 @@ basics from [GoRails](https://gorails.com/episodes/strings-in-ruby?autoplay=1) s
     36.gcd(60)                  #=> 12
     2.gcd(2)                    #=> 2
 ```
+
+
+## Arrays
+
+- **first**: Returns one or more leading elements.
+
+- **last**: Returns one or more trailing elements.
+
+- **max**: Returns one or more maximum-valued elements, as determined by <=> or a given block.
+
+- **min**: Returns one or more minimum-valued elements, as determined by <=> or a given block.
+
+- **sort**: Returns all elements in an order determined by <=> or a given block.
+
+- **take**: Returns leading elements as determined by a given index.
+
+- **take_while**: Returns leading elements as determined by a given block.
+
+- **uniq**: Returns an array containing non-duplicate elements.
+
+- **values_at**: Returns the elements at given offsets.
+
+- **<<:** Appends an element.
+
+- **insert**: Inserts given objects at a given offset; does not replace elements.
+
+- **push**: Appends elements.
+
+- **unshift**: Prepends leading elements.
+
+- **delete**: Removes elements equal to a given object.
+
+- **delete_at**: Removes the element at a given offset.
+
+- **delete_if**: Removes elements specified by a given block.
+
+- **keep_if**: Removes elements not specified by a given block.
+
+- **pop**: Removes and returns the last element.
+
+- **join**: Returns a newsString containing the elements joined by the field separator.
+
+- **to_a**: Returns self or a new array containing all elements.
+
+- **sum**: Returns a sum of elements according to either + or a given block.
