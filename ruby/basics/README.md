@@ -309,3 +309,5 @@
 
 
 - **yield** is specifically for calling blocks passed to a method, while **Procs** and **Lambdas** are objects that encapsulate blocks and can be stored in variables or passed around.
+
+
