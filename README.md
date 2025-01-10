@@ -9,3 +9,7 @@ Personal notes for summarizing, explaining, and documenting certain topics.
 
 - Ruby
   - basics
+
+- Networking 
+  - dns
+  - http
