@@ -694,132 +694,277 @@
 
 ## Decorators
 
-- 2 different Decorators: Function Decorators and Class Decorators 
+- 2 different Decorators: Function Decorators and Class Decorators
 - Function Decorator: function that takes another function as argument and extends the behavior of this function without explicitly modifying it.
-    ```py
-    def func_dec(func):
-        def wrapper():
-            print("start")
-            func()
-            print("End")
-        return wrapper
-        
-    @func_dec 
-    # x = func_dec(print_name)  
-    def print_name():
-        print("hello")
-        
-        
-    print_name()
-    # x()
-    ```
+
+  ```py
+  def func_dec(func):
+      def wrapper():
+          print("start")
+          func()
+          print("End")
+      return wrapper
+
+  @func_dec
+  # x = func_dec(print_name)
+  def print_name():
+      print("hello")
+
+
+  print_name()
+  # x()
+  ```
 
 - to pass arguments to function, use `*args` and `**kwagrs` in wrapper function and pass them too to the desired function
-    ```py
-    def func_dec(func):
-        def wrapper(*args, **kwargs):
-            print("start")
-            result = func(*args, **kwargs)
-            print("End")
-            return result
-        return wrapper
-        
-        
-    @func_dec    
-    def print_name(name):
-        print(f"hello {name}")
-        
-        
-        
-    print_name("doha")
-    ```
+
+  ```py
+  def func_dec(func):
+      def wrapper(*args, **kwargs):
+          print("start")
+          result = func(*args, **kwargs)
+          print("End")
+          return result
+      return wrapper
+
+
+  @func_dec
+  def print_name(name):
+      print(f"hello {name}")
+
+
+
+  print_name("doha")
+  ```
 
 - function identity: is the python figure out what is the running function, by the pervious code, python will think that the running function is the `wrapper` function and to fix this; import `functools` package
-    ```py
-    import functools
 
-    def func_dec(func):
-        @functools.wraps(func)
-        def wrapper(*args, **kwargs):
-            print("start") #1
-            result = func(*args, **kwargs)
-            print("End") #3
-            return result
-        return wrapper
-        
-        
-    @func_dec    
-    def print_name(name):
-        print(f"hello {name}")
-        
-    print_name("doha") #2
-    print(print_name.__name__) #4  
-    ```
+  ```py
+  import functools
 
-- what about decorator function with args, 
-    ```py
-    def repeat(num_times):
-        def decorator_repeat(func):
-
-            @functools.wraps(func)
-            def wrapper(*args,**kwargs):
-                for _ in range(num_times):
-                    res = func(*args, **kwargs) 
-                return res
-            return wrapper
-        return decorator_repeat    
+  def func_dec(func):
+      @functools.wraps(func)
+      def wrapper(*args, **kwargs):
+          print("start") #1
+          result = func(*args, **kwargs)
+          print("End") #3
+          return result
+      return wrapper
 
 
+  @func_dec
+  def print_name(name):
+      print(f"hello {name}")
+
+  print_name("doha") #2
+  print(print_name.__name__) #4
+  ```
+
+- what about decorator function with args,
+
+  ```py
+  def repeat(num_times):
+      def decorator_repeat(func):
+
+          @functools.wraps(func)
+          def wrapper(*args,**kwargs):
+              for _ in range(num_times):
+                  res = func(*args, **kwargs)
+              return res
+          return wrapper
+      return decorator_repeat
 
 
-    @repeat(num_times=3) # -> this is the decorator
-    def print_name(name):
-        print(f"hello {name}")
+  @repeat(num_times=3) # -> this is the decorator
+  def print_name(name):
+      print(f"hello {name}")
 
-    print_name("doha")
-    ```
+  print_name("doha")
+  ```
 
-- class decorator: 
-    ```py
-    import functools
+- class decorator:
 
-    class CountCalls:
-        # the init needs to have the func as argument and stores it
-        def __init__(self, func):
-            functools.update_wrapper(self, func) # instead of functools.wraps to preserve the information about our function.
-            self.func = func
-            self.num_calls = 0
-        
-        # extend functionality, execute function, and return the result
-        def __call__(self, *args, **kwargs):
-            self.num_calls += 1
-            print(f"Call {self.num_calls} of {self.func.__name__!r}")
-            return self.func(*args, **kwargs)
+  ```py
+  import functools
 
-    @CountCalls
-    def say_hello(num):
-        print("Hello!")
-        
-    say_hello(5)
-    say_hello(5)
-    ```
+  class CountCalls:
+      # the init needs to have the func as argument and stores it
+      def __init__(self, func):
+          functools.update_wrapper(self, func) # instead of functools.wraps to preserve the information about our function.
+          self.func = func
+          self.num_calls = 0
 
+      # extend functionality, execute function, and return the result
+      def __call__(self, *args, **kwargs):
+          self.num_calls += 1
+          print(f"Call {self.num_calls} of {self.func.__name__!r}")
+          return self.func(*args, **kwargs)
+
+  @CountCalls
+  def say_hello(num):
+      print("Hello!")
+
+  say_hello(5)
+  say_hello(5)
+  ```
 
 ## Generators
 
 - Generators: are functions that return an object that can be iterated over, they generate the items inside the object lazily aka generate the object one in a time and only if i asked for it
 
 - A generator is defined like a normal function but with the yield statement instead of return.
-    ```py
-    def my_generator():
-        yield 1
-        yield 2
-        yield 3
-    ```
+  ```py
+  def my_generator():
+      yield 1
+      yield 2
+      yield 3
+  ```
 - benefits: they are very memory efficient when working in large data
 
+## Function Arguments
 
-## Threading and Multiprocessing
+- positional argument: passing arguments in function call by assignment
 
-- 
+  ```py
+  def foo(a: int, b: int, c: int):
+    print(f"a={a}, b={b}, c={c}")
 
+  foo(b=6, c=4, a=2) # valid
+  foo(2, b=6, c=4)   # valid
+  foo(2, b=6, 4)     # not valid
+  foo(2, b=6, a=2)   # not valid
+  ```
+
+- default arguments: function may or may not receive a value of the default parameter, if received then use the received value if not use the default one.
+- must pass the default parameters at the end of arguments list in function definition.
+
+  ```py
+  def foo(a: int, b: int, c: int, d: int = 6):
+    print(f"a={a}, b={b}, c={c} and d={d}")
+
+  foo(1,2,3) # output: a=1, b=2, c=3, d=6
+  foo(1,2,3,5) # output: a=1, b=2, c=3, d=5
+  ```
+
+- `*args` and `**kwargs`:
+
+  - the variable that starts with `*` is tuple and can iterate over that var, the variable that starts with `**` is for key-value aka - dictionary -
+  - they are optional so can be sent with arguments or not
+
+    ```py
+    def foo(a: int, b: int, *args, **kwargs):
+      print(a, b)
+      for arg in args:
+        print(arg)
+      for key in kwargs:
+        print(key, kwargs[key])
+
+    foo(1, 2, 3, 4, x=8) # 1->a, 2->b, (3,4)->args, x=8->kwargs
+    ```
+
+- unpacking:
+- works with lists and tuples
+- should has the same length of arguments in calling function
+
+```py
+ def foo(a,b,c):
+   print(a,b,c)
+
+ num_list = [1,2,3]
+ foo(*my_list)
+```
+
+- for dictionary, the keys must match the name of function arguments
+
+```py
+ def foo(a,b,c):
+   print(a,b,c)
+ num_dict = {'a': 1, 'b':2, 'c':3}
+ foo(**num_dict)
+```
+
+- mutable objects can be changed, immutable objects can not be changed,
+  but mutable objects has a immutable objects inside can be changed, unless rebind the reference in the method then the reference is not change outside the method
+
+```py
+# Rebind a mutable reference -> no change
+def foo(a_list):
+    a_list = [50, 60, 70] # a_list is now a new local variable within the function
+    a_list.append(50)
+
+my_list = [1, 2, 3]
+print('my_list before foo():', my_list)
+foo(my_list) # [1,2,3]
+print('my_list after foo():', my_list)
+```
+
+## Asterisk operator
+
+- multiplication `*`
+- power `**`
+- repeat items in a list/tuple/strings `my_list = [0,1] * 3 # [0,1,0,1,0,1]`
+- argus and kwargs
+- unpacking a list/tuple/dict
+
+  ```py
+  nums = [1, 2, 3, 4, 5, 6]
+  first, *middle, last = nums
+
+  print(first) # 1
+  print(middle) # list [2,3,4,5]
+  print(last) # 6
+  ```
+
+## Shallow VS Deep copying
+- shallow copies: Only one level deep. It creates a new collection object and populates it with references to the nested objects. This means modyfing a nested object in the copy deeper than one level affects the original.
+  ```py
+  import copy
+  list_a = [1, 2, 3, 4, 5]
+  list_b = copy.copy(list_a)
+
+  # not affects the other list
+  list_b[0] = -10
+  print(list_a)
+  print(list_b)
+  # [1, 2, 3, 4, 5]
+  # [-10, 2, 3, 4, 5]
+
+
+
+  import copy
+  list_a = [[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]]
+  list_b = copy.copy(list_a)
+
+  # affects the other!
+  list_a[0][0]= -10
+  print(list_a)
+  print(list_b)
+
+
+
+  # shallow copies
+  list_b = list(list_a)
+  list_b = list_a[:]
+  list_b = list_a.copy()
+  ```
+- deep copies: A full independent clone. It creates a new collection object and then recursively populates it with copies of the nested objects found in the original.
+  ```py 
+  import copy
+  list_a = [[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]]
+  list_b = copy.deepcopy(list_a)
+
+  # not affects the other
+  list_a[0][0]= -10
+  print(list_a)
+  print(list_b)
+
+  ```
+
+
+## Context Managers 
+-  Context managers are a great tool for resource management. They allow you to allocate and release resources precisely when you want to.
+  ```py
+  with open('notes.txt', 'w') as f:
+    f.write('some todo...') 
+  ```
+  This will open a file and makes sure to automatically close it after program execution leaves the context of the with statement. It also handles exceptions and makes sure to properly close the file even in case of an exception.
+  
