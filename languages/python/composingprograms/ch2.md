@@ -94,3 +94,14 @@
 
 - explanation of constraint system : https://grok.com/share/bGVnYWN5_c524f30d-4dfb-45c2-84e8-453ff0092238
 
+
+
+## 2.5  Object-Oriented Programming
+- interfaces in go, ruby, and python are implicit, if an object has the required attributes it automatically satisfies the interface 
+- Attributes: Data stored in an object
+- An interface is a set of attributes (methods or variables) that objects must have.
+- Only rely on an object’s public interface (methods/attributes), not its internal details or specific class.
+- Class: Blueprint for objects.
+
+## 2.6   Implementing Classes and Objects
+- 

@@ -1,0 +1,40 @@
+# Notes in learning journey 
+
+- seal controller is in kube-system namespace, it could be in anywhere else
+- so the 2 components of seal one is installed via k8s cluster and other is a command/client tool to interact with cluster
+- `kubectl get secret <secret-name> -n <namespace> -o yaml > my-secret.yaml` -> creates a yaml file of a secrets/ anything actually 
+- **Scope in sealed secrets**: 
+    -  why we have scopes? the Role Based Access Control (RBAC) in k8s controls who can access what so some of us can have access to certain namespaces and other don't, so the danger here is that the seal secrets are a public thing and once a developer can access the cluster and see the original secrets in namespace - how scopes work? encryption process of the secrets has the actual namespace and name of secret itself 
+    -  kinds of scopes: 
+        -  1.  *strict (default)*: secrets encrypted with namespace ad name so if a evil developer try to change it's name and decrypt it will fail
+        -  2. *namespace-wide*: encrypted by namespace but not name, can rename the sealed secrets within the same namespace and it'll work 
+        -  3. *cluster-wide*: nothing not by namespace or name, any developer can rename the sealed secrets and rename it move it to other namespaces and the it will work fine
+    - there is not separate key for each namespace instead it evolve the name of namespace and secret name in encryption process 
+    - how to define scope in secrets?
+        - using `--scope <option>` flag with `kubeseal`
+        - using annotations in the input secrets `sealedsecrets.bitnami.com/namespace-wide: "true"`
+    - **men el-akhair**: the scope prevent moving and applying wrong sealed secrets by changing their name and existing location of namespace, so that the sealed secrets which is initially created in dev does not goes to prod namespace by mistake or by evil hands, and their is different types of restrictions as namespace-wide and cluster-wide  
+- some usages of secret seal:
+    - **convert existing secrets to seal secrets**: by annotating the existing secrets with `sealedsecrets.bitnami.com/managed: "true"` -> then pass the existing secret file to `kubeseal` and that's create a seal secrets with the same name and in the same namespace -> don't forget to apply new seal file to your cluster namespace or it's not gonna work -> and tada the controller will take care of the rest, han-verify ezay ?! -> `kubectl get sealedsecret my-secret -n default` if it exist here then we're fine and 100 100
+    - **updating secrets while others remain the same**: by annotating the existing secrets with `sealedsecrets.bitnami.com/patch: "true"` -> then pass to `kubeseal` it generates a same name same namespace file and don't forget to apply and voila things are updated 
+    - **raw mode**: a quick way to encrypt secret that doesn't have a manifest in cluster, should specify the scope of that secrete ex. `echo -n "doha" | kubeseal --raw --scope cluster-wide`
+    - *validation*: check the validation of sealed secret without applying `kubeseal --validate < sealed-secret.yaml`
+    - 
+- **Secret Rotation**: 
+    - 2 parts: renewal the public and private key -> re-encrypt the secrets 
+    - *Sealing key renewal*: 
+        - default = 30 days 
+        - the most created sealing key is the one that is used to seal new secrets 
+        - to change the default value: add `--key-renew-period=<value>` to args part in container
+        - value of period should be in go duration flag
+        - value 0 = no renewal rotation 
+        - sealed secrets are NOT automatically rotated and old keys are NOT deleted when new keys are generated 
+    - *user secret rotation*: 
+        - key renewal and sealedsecret rotation are NOT a replacement or enough for you to NOT change your own secrets 
+    - in case of sealing key is compromised/have just known by one hacker, consider all the sealed secrets can be decrypted via that expose sealing key -> what to do in such a situation? renewal sealing key and rotate all your actual secrets and craft new sealedsecrets resources with those new secrets  
+    - *manual key management*: DON'T DELETE OLD KEYS UNLESS YOU KNOW WHAT YOU'RE DOING
+        -  you can share the same sealing key among a few clusters so that you can apply exactly the same sealed secret in multiple clusters.
+    - *re-encryption*: the process of re-sealing existing sealed secrets using latest sealing key (same passwords, different encrypted keys) 
+        - before deleting old sealing keys you need tp re-encrypt your sealedsecrets with the latest private key.
+        - `kubeseal --re-encrypt <my_sealed_secret.json >tmp.json \ && mv tmp.json my_sealed_secret.json`
+        - `--re-encrypt` doesn’t update the in-cluster object automatically. If the in-cluster SealedSecret is unchanged, you’ll need to delete and reapply it
