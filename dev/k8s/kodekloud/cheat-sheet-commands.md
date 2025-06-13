@@ -23,4 +23,6 @@
 - `kubectl expose pod <pod-name> --port=6379 --name=<service-name>`: expose a pod by creating a service name on specified port 
 - `kubectl run <pod-name> --image=<image-name> --port=80 --expose`: create a pod and create a service to expose it on port 80 with service type clusterIp as a default 
 - `kubectl get svc`: list all services
-- ``
+- `kubectl -n elastic-stack exec -it app -- cat /log/app.log`: exec a command in container inside a pod
+- `kubectl logs <pod-name> -n <namespace>`: show the logs for the container inside the pod 
+- `kubectl replace --force -f <file-definition.yaml>`: replace a object file with new one, deletes the existing and create a new one 
