@@ -1,0 +1,26 @@
+- `kubectl cluster-info`: gets all information about the cluster 
+- `kubectl run nginx --image nginx`: pulls the image of nginx and creates a pod of that image
+- `kubectl get pods`: list of pods available
+- `kubectl create -f pod-file.yml`: create a pod from a yml file 
+- `kubectl describe pod my-pod`: gets an infos about the pod 
+- `kubectl run --help`: gets all available options fro this command
+- `kubectl run <pod-name> --image=<image-name> --dry-run=client -o yaml`: generate a yml file for a pod with specify image without actual creating the pod 
+- `kubectl apply -f <file.yaml>`: creates the object that is specify in this yml file
+- `kubectl get pod <pod-name> -o yaml > <pod-file>.yaml`: this commands generates a yml file from existing pod, then edit the file to make the necessary changes, delete, and re-create the pod.
+- `kubectl scale --replicas=6 -f <replicaset>.yml`: change the number of replica set of that replica set file definition
+- `kubectl scale --replicas=6 replicaset my-replica`: change number of replica sets using replica object 
+- `kubectl get replicaset`: gets all replica sets on default namespace
+- `kubectl get replicationcontroller`: gets all replica controllers 
+- `kubectl replace -f replicaset-definition.yaml`: recreate the objects of that yaml file
+- `kubectl get all`: gets all k8s created of type deployment, replicaset and pods 
+- `kubectl create deployment http-frontend --image=<image-name> --replicas=3`: creates a deployment objects using cli
+- `--dry-run=client` option. This will not create the resource, instead, tell you whether the resource can be created and if your command is right.
+- `-o yaml`: This will output the resource definition in YAML format on screen.
+- `kubectl get pods --namespace=kube-system`: gets the pods from specific namespace 
+- `kubectl config set-context $(kubectl config current-context) --namespace=dev`: change the default settings of namespace 
+- `kubectl get pods --all-namespaces`: gets all objects in all namespaces 
+- `kubectl run redis --image=redis:alpine --labels=tier=db`: create pod with customized labels
+- `kubectl expose pod <pod-name> --port=6379 --name=<service-name>`: expose a pod by creating a service name on specified port 
+- `kubectl run <pod-name> --image=<image-name> --port=80 --expose`: create a pod and create a service to expose it on port 80 with service type clusterIp as a default 
+- `kubectl get svc`: list all services
+- ``
