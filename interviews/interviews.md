@@ -53,18 +53,11 @@
 
 
 - what is the stateful and stateless firewall?
-    - 
 - what is the difference between asymmetric and symmetric ?
-
 - how to get the changes that are deleted using reset --hard in git ?
-
 - what is GitOps ?
     - is a set of 
-
 - what are types of consistences ?
-
 - how aws lambda works ?
-
-
 - what is the services types in k8s ?
 - what is DaemonSet in k8s?
