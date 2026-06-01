@@ -20,12 +20,31 @@ At first, we distributed the traffic between Nginx and our new Istio gateways: 5
 
 Taking it by numbers: for just 5% of our traffic in Istio, it took a total of 10 pods, with each pod burning between 2 to 3 cores. That was a lot compared to how Nginx used to consume.
 
-(Insert your CPU usage comparison graph here showing WasmPlugin vs. Nginx)
+![old-wasm](wasmplugin.svg)
 
-## One Other Chance for WasmPlugin
-The first thing that came to my mind was optimizing the plugin. Instead of making it run sequentially, we could group similar paths, check only the group header, and terminate once matched, so the time complixity would be O(log(M+N)) rather than O(N), where the N is the number of paths and M is number of group headers.
 
-At first, this sounded like a great solution. In the worst case, it only checks the group header plus the members in that specific group. Our analysis showed real, better optimizations. But unfortunately, after deploying this to production with the same 5% traffic, it only reduced the load to 1.5 ~ 2 cores. We still saw that as a lot, so we wanted to find other solutions.
+## One Other Chance for WasmPlugin: Load Testing and Grouping
+The first thing that came to my mind was optimizing the plugin. Instead of making it run sequentially, we could group similar paths, check only the group header, and terminate once matched, so the time complexity would be O(log(M+N)) rather than O(N), where the N is the number of paths and M is number of group headers. We built a reusable k6 load-testing harness to drive traffic up to 50k RPS (Requests Per Second) and capture performance flamegraphs.
+
+We ran two major test iterations:
+
+**Run 1: The Sequential Baseline (Without Grouping)**
+Under a 50k RPS spike, the public gateway maxed out 10 pods, burning about 1.5 to 2 cores *per pod*. Collectively, it was burning ~17 cores just to execute the Wasm filter sequentially.
+
+**Run 2: Grouping Paths & Internal Checks**
+We modified the plugin to group the paths and moved the regex checks internally. The throughput improvements were massive. This allowed us to handle our heavy 10k RPS plateau using fewer pods, and pushed our throughput significantly higher. 
+
+Here is the full picture of how throughput improved across the iterations:
+
+| Service | Sequential (Without Grouping) | Grouping & Internal Checks |
+|---|---|---|
+| **Service 1** | 28.8k RPM | 59.7k RPM |
+| **Service 2** | 57.7k RPM | 97.0k RPM |
+
+At first, this sounded like a massive win. Our analysis showed real, tangible optimizations. But unfortunately, while the RPM was much higher, hitting that absolute peak of 50k RPS still saturated all 10 pods at ~2 cores each. 
+
+Even with our best optimizations, WasmPlugin was simply too heavy for our infrastructure during traffic spikes. We wanted to find other solutions.
+
 
 ## Asking the Community
 My manager said, "If you see yourself walking alone and facing issues that no one else is facing, then it's more probably you are on the wrong road." So we posted questions in the Istio Slack community, defined our problem, and they suggested we could use either EnvoyFilter or Wasmtime, which are more performant than WasmPlugin.
@@ -33,7 +52,15 @@ My manager said, "If you see yourself walking alone and facing issues that no on
 Starting from the Beginning: EnvoyFilter
 The transition from Wasm to EnvoyFilter surprised me so much. The performance was much, much, much better than expected, and it solved a lot of our issues.
 
-(Insert your benchmark results/graphs here showing the performance difference between WasmPlugin and EnvoyFilter)
+## Starting from the Beginning: EnvoyFilter
+The transition from Wasm to EnvoyFilter surprised me so much. The performance was much, much, much better than expected.
+
+We ran the exact same 50k RPS k6 load test against the new EnvoyFilter setup. It was almost hard to believe:
+
+* During the absolute peak spike the same one that forced WasmPlugin to burn ~17 cores across 10 pods the EnvoyFilter setup barely reach 6 cores.
+* CPU usage hovered between `300m` to `600m` (0.3 to 0.6 cores) per pod.
+
+![envoyfilter](envoyfilter.svg)
 
 ## Current Design & New Problems
 While the performance was great, the setup introduced new headaches. Here is how our design works:
@@ -45,6 +72,8 @@ While the performance was great, the setup introduced new headaches. Here is how
 - For each gateway, there is more than 1 service.
 
 - Each service has its own EnvoyFilter.
+
+![istio-architecture](istio-architecture.drawio.png)
 
 After compiling and applying this in the cluster, all the EnvoyFilters for each service are combined together to form one huge file of EnvoyFilter that processes the services one by one. If they all have the same priority (the default is 0), they simply get organized alphabetically.
 

@@ -32,4 +32,9 @@ And by that, some action items we need to solve in the long term are:
 - Switch to service mesh instead of gateway
 - Sync our development environment with our production one
 - don't work alone, search and ask what others are doing better 
-- - most of the solutions are solved if you just talk about them, asking for help is the most valuable thing here i learned, huge thank to my team
+- most of the solutions are solved if you just talk about them, asking for help is the most valuable thing here i learned, huge thank to my team
+
+
+
+
+k6 test specifications 
